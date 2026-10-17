@@ -4,6 +4,7 @@
 .contact-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:start;margin-top:42px}
 .contact-layout .contact-bar{display:flex;flex-wrap:wrap;gap:16px;margin-top:0;padding-top:20px}
 .contact-layout .contact-bar>a{font-size:clamp(20px,2.1vw,30px);overflow-wrap:anywhere}
+#copy-email{padding:12px 18px;min-height:44px;line-height:1.4;white-space:nowrap}
 .contact-layout .contact-links{flex-wrap:wrap;gap:14px}
 .contact-layout .contact-links button{margin-left:0}
 .contact-phone{display:flex;align-items:center;gap:12px;width:fit-content;max-width:100%;margin-top:24px;padding:14px 16px;border:1px solid transparent;border-radius:16px;background:linear-gradient(#29233e,#29233e) padding-box,linear-gradient(120deg,#a17de8,#68bde9) border-box;font-size:18px;color:#eee8ff;box-shadow:-5px 0 20px -12px #a779ff99,5px 0 20px -12px #55cfff88;transition:box-shadow .25s,translate .25s,color .25s}
