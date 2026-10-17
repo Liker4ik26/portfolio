@@ -7,7 +7,7 @@ const animatedNavLinks=[...animatedNav.querySelectorAll('a[href^="#"]')];
 const navIndicator=document.createElement('span');
 navIndicator.className='nav-indicator';navIndicator.setAttribute('aria-hidden','true');animatedNav.append(navIndicator);
 const navSections=[...document.querySelectorAll('.section[id]')].filter(section=>animatedNavLinks.some(link=>link.hash===`#${section.id}`));
-let activeNavLink=null,hoveredNavLink=null,headerFrame=0;
+let activeNavLink=null,hoveredNavLink=null,headerFrame=0,navGeometryDirty=true;
 function placeNavIndicator(link){
   navIndicator.classList.toggle('visible',!!link);
   if(!link)return;
@@ -18,12 +18,17 @@ function placeNavIndicator(link){
   navIndicator.style.setProperty('--nav-height',`${linkRect.height+18}px`);
 }
 function updateAnimatedHeader(){
-  headerFrame=0;animatedHeader.classList.toggle('has-scrolled',scrollY>20);
+  headerFrame=0;
   const threshold=animatedHeader.offsetHeight+innerHeight*.2;
   const section=navSections.findLast(item=>item.getBoundingClientRect().top<=threshold);
-  activeNavLink=animatedNavLinks.find(link=>link.hash===`#${section?.id}`)||null;
-  animatedNavLinks.forEach(link=>{if(link===activeNavLink)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current')});
-  placeNavIndicator(hoveredNavLink||activeNavLink);
+  const nextNavLink=animatedNavLinks.find(link=>link.hash===`#${section?.id}`)||null;
+  animatedHeader.classList.toggle('has-scrolled',scrollY>20);
+  if(nextNavLink!==activeNavLink||navGeometryDirty){
+    if(activeNavLink)activeNavLink.removeAttribute('aria-current');
+    activeNavLink=nextNavLink;
+    if(activeNavLink)activeNavLink.setAttribute('aria-current','location');
+    placeNavIndicator(hoveredNavLink||activeNavLink);navGeometryDirty=false;
+  }
 }
 function queueHeaderUpdate(){if(!headerFrame)headerFrame=requestAnimationFrame(updateAnimatedHeader)}
 animatedNavLinks.forEach(link=>{
@@ -32,9 +37,10 @@ animatedNavLinks.forEach(link=>{
   link.addEventListener('blur',()=>placeNavIndicator(activeNavLink));
 });
 animatedNav.addEventListener('pointerleave',()=>{hoveredNavLink=null;placeNavIndicator(activeNavLink)});
-addEventListener('scroll',queueHeaderUpdate,{passive:true});addEventListener('resize',queueHeaderUpdate);
-document.addEventListener('portfolio:languagechange',queueHeaderUpdate);addEventListener('load',queueHeaderUpdate);
-document.fonts.ready.then(queueHeaderUpdate);queueHeaderUpdate();
+function refreshNavGeometry(){navGeometryDirty=true;queueHeaderUpdate()}
+addEventListener('scroll',queueHeaderUpdate,{passive:true});addEventListener('resize',refreshNavGeometry);
+document.addEventListener('portfolio:languagechange',refreshNavGeometry);addEventListener('load',refreshNavGeometry);
+document.fonts.ready.then(refreshNavGeometry);queueHeaderUpdate();
 document.querySelectorAll('.github-projects .reveal,.commercial-projects .reveal').forEach((el,i)=>el.style.setProperty('--reveal-delay',`${i%3*95}ms`));
 document.querySelectorAll('.skill-card').forEach((el,i)=>el.style.setProperty('--skill-delay',`${i%3*110}ms`));
 if(matchMedia('(pointer:fine)').matches){document.querySelectorAll('.commercial-cover,.project-image').forEach(el=>{
