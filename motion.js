@@ -7,23 +7,31 @@ const animatedNavLinks=[...animatedNav.querySelectorAll('a[href^="#"]')];
 const navIndicator=document.createElement('span');
 navIndicator.className='nav-indicator';navIndicator.setAttribute('aria-hidden','true');animatedNav.append(navIndicator);
 const navSections=[...document.querySelectorAll('.section[id]')].filter(section=>animatedNavLinks.some(link=>link.hash===`#${section.id}`));
-let activeNavLink=null,hoveredNavLink=null,headerFrame=0;
+let activeNavLink=null,hoveredNavLink=null,headerFrame=0,navGeometryDirty=true,lastNavGeometry='';
 function placeNavIndicator(link){
   navIndicator.classList.toggle('visible',!!link);
   if(!link)return;
   const navRect=animatedNav.getBoundingClientRect(),linkRect=link.getBoundingClientRect();
+  const geometry=[linkRect.left-navRect.left,linkRect.top-navRect.top,linkRect.width,linkRect.height].join(',');
+  if(geometry===lastNavGeometry)return;
+  lastNavGeometry=geometry;
   navIndicator.style.setProperty('--nav-x',`${linkRect.left-navRect.left-12}px`);
   navIndicator.style.setProperty('--nav-y',`${linkRect.top-navRect.top-9}px`);
   navIndicator.style.setProperty('--nav-width',`${linkRect.width+24}px`);
   navIndicator.style.setProperty('--nav-height',`${linkRect.height+18}px`);
 }
 function updateAnimatedHeader(){
-  headerFrame=0;animatedHeader.classList.toggle('has-scrolled',scrollY>20);
+  headerFrame=0;
   const threshold=animatedHeader.offsetHeight+innerHeight*.2;
   const section=navSections.findLast(item=>item.getBoundingClientRect().top<=threshold);
-  activeNavLink=animatedNavLinks.find(link=>link.hash===`#${section?.id}`)||null;
-  animatedNavLinks.forEach(link=>{if(link===activeNavLink)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current')});
-  placeNavIndicator(hoveredNavLink||activeNavLink);
+  const nextNavLink=animatedNavLinks.find(link=>link.hash===`#${section?.id}`)||null;
+  animatedHeader.classList.toggle('has-scrolled',scrollY>20);
+  if(nextNavLink!==activeNavLink||navGeometryDirty){
+    if(activeNavLink)activeNavLink.removeAttribute('aria-current');
+    activeNavLink=nextNavLink;
+    if(activeNavLink)activeNavLink.setAttribute('aria-current','location');
+    placeNavIndicator(hoveredNavLink||activeNavLink);navGeometryDirty=false;
+  }
 }
 function queueHeaderUpdate(){if(!headerFrame)headerFrame=requestAnimationFrame(updateAnimatedHeader)}
 animatedNavLinks.forEach(link=>{
@@ -32,17 +40,30 @@ animatedNavLinks.forEach(link=>{
   link.addEventListener('blur',()=>placeNavIndicator(activeNavLink));
 });
 animatedNav.addEventListener('pointerleave',()=>{hoveredNavLink=null;placeNavIndicator(activeNavLink)});
-addEventListener('scroll',queueHeaderUpdate,{passive:true});addEventListener('resize',queueHeaderUpdate);
-document.addEventListener('portfolio:languagechange',queueHeaderUpdate);addEventListener('load',queueHeaderUpdate);
-document.fonts.ready.then(queueHeaderUpdate);queueHeaderUpdate();
+function refreshNavGeometry(){navGeometryDirty=true;queueHeaderUpdate()}
+addEventListener('scroll',queueHeaderUpdate,{passive:true});addEventListener('resize',refreshNavGeometry);
+document.addEventListener('portfolio:languagechange',refreshNavGeometry);addEventListener('load',refreshNavGeometry);
+document.fonts.ready.then(refreshNavGeometry);queueHeaderUpdate();
 document.querySelectorAll('.github-projects .reveal,.commercial-projects .reveal').forEach((el,i)=>el.style.setProperty('--reveal-delay',`${i%3*95}ms`));
 document.querySelectorAll('.skill-card').forEach((el,i)=>el.style.setProperty('--skill-delay',`${i%3*110}ms`));
 if(matchMedia('(pointer:fine)').matches){document.querySelectorAll('.commercial-cover,.project-image').forEach(el=>{
-  el.addEventListener('pointermove',event=>{if(motionPreference.matches)return;const rect=el.getBoundingClientRect();el.style.setProperty('--tilt-x',`${-(event.clientY-rect.top-rect.height/2)/rect.height*5}deg`);el.style.setProperty('--tilt-y',`${(event.clientX-rect.left-rect.width/2)/rect.width*5}deg`)});
-  el.addEventListener('pointerleave',()=>{el.style.removeProperty('--tilt-x');el.style.removeProperty('--tilt-y')});
+  let tiltFrame=0,tiltPoint=null;
+  el.addEventListener('pointermove',event=>{
+    if(motionPreference.matches)return;
+    tiltPoint={x:event.clientX,y:event.clientY};
+    if(!tiltFrame)tiltFrame=requestAnimationFrame(()=>{tiltFrame=0;const rect=el.getBoundingClientRect();el.style.setProperty('--tilt-x',`${-(tiltPoint.y-rect.top-rect.height/2)/rect.height*5}deg`);el.style.setProperty('--tilt-y',`${(tiltPoint.x-rect.left-rect.width/2)/rect.width*5}deg`)});
+  },{passive:true});
+  el.addEventListener('pointerleave',()=>{if(tiltFrame)cancelAnimationFrame(tiltFrame);tiltFrame=0;el.style.removeProperty('--tilt-x');el.style.removeProperty('--tilt-y')});
 })}
 const galleryImage=document.getElementById('gallery-image');
 galleryImage.addEventListener('load',()=>{if(motionPreference.matches)return;galleryImage.classList.remove('gallery-changing');requestAnimationFrame(()=>galleryImage.classList.add('gallery-changing'))});
+
+// Keep ambient effects running while visible; resume the same animation phase on return.
+const ambientVisibility=new Map([...document.querySelectorAll('.hero,.name-marquee,.contact')].map(element=>[element,true]));
+function updateAmbientVisibility(){ambientVisibility.forEach((visible,element)=>element.classList.toggle('ambient-paused',!visible||document.hidden))}
+const ambientObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>ambientVisibility.set(entry.target,entry.isIntersecting));updateAmbientVisibility()},{rootMargin:'200px 0px'});
+ambientVisibility.forEach((visible,element)=>ambientObserver.observe(element));
+document.addEventListener('visibilitychange',updateAmbientVisibility);
 
 // Keep the bird in the top layer so it also follows the pointer over modal dialogs.
 const birdPointer=matchMedia('(hover:hover) and (pointer:fine)');
@@ -54,7 +75,7 @@ if('showPopover' in HTMLElement.prototype){
     layer.className='bird-cursor-layer';layer.popover='manual';layer.setAttribute('aria-hidden','true');
     const trail=document.createElement('div');trail.className='bird-trail';layer.append(trail);
     const bird=document.createElement('div');bird.className='bird-cursor';bird.append(document.importNode(svg,true));layer.append(bird);document.body.append(layer);
-    let idleTimer,activeDialog=null,lastTrail=null,lastMotion=null;
+    let idleTimer,activeDialog=null,lastTrail=null,lastMotion=null,birdFrame=0,pendingBirdMove=null;
     const resetBirdTilt=()=>{lastMotion=null;bird.style.setProperty('--bird-tilt','0deg')};
     const tiltBird=event=>{
       if(motionPreference.matches){resetBirdTilt();return}
@@ -86,14 +107,16 @@ if('showPopover' in HTMLElement.prototype){
     const updateBirdHover=target=>bird.classList.toggle('hovering',target instanceof Element&&!!target.closest('button:not(:disabled),a[href],[role="button"],.project-case,.project-card,.engineering-card'));
     document.addEventListener('pointerover',event=>updateBirdHover(event.target));
     document.addEventListener('pointerout',event=>updateBirdHover(event.relatedTarget));
-    const hideBird=()=>{clearTimeout(idleTimer);resetBirdTilt();lastTrail=null;trail.replaceChildren();bird.classList.remove('moving','hovering','pressing');layer.querySelectorAll('.bird-spark-burst').forEach(burst=>burst.remove());document.documentElement.classList.remove('bird-cursor-active');if(layer.matches(':popover-open'))layer.hidePopover()};
+    const hideBird=()=>{if(birdFrame)cancelAnimationFrame(birdFrame);birdFrame=0;pendingBirdMove=null;clearTimeout(idleTimer);resetBirdTilt();lastTrail=null;trail.replaceChildren();bird.classList.remove('moving','hovering','pressing');layer.querySelectorAll('.bird-spark-burst').forEach(burst=>burst.remove());document.documentElement.classList.remove('bird-cursor-active');if(layer.matches(':popover-open'))layer.hidePopover()};
     const raiseBird=()=>{
       const dialog=document.querySelector('dialog:modal');
       if(dialog!==activeDialog&&layer.matches(':popover-open'))layer.hidePopover();
       activeDialog=dialog;
       if(!layer.matches(':popover-open'))layer.showPopover();
     };
-    document.addEventListener('pointermove',event=>{
+    function renderBirdMove(){
+      birdFrame=0;const event=pendingBirdMove;pendingBirdMove=null;
+      if(!event)return;
       if(!birdPointer.matches||event.pointerType!=='mouse'){hideBird();return}
       raiseBird();
       leaveTrail(event);
@@ -103,6 +126,10 @@ if('showPopover' in HTMLElement.prototype){
       document.documentElement.classList.add('bird-cursor-active');
       bird.classList.add('moving');clearTimeout(idleTimer);
       idleTimer=setTimeout(()=>{bird.classList.remove('moving');resetBirdTilt()},140);
+    }
+    document.addEventListener('pointermove',event=>{
+      pendingBirdMove=event;
+      if(!birdFrame)birdFrame=requestAnimationFrame(renderBirdMove);
     },{passive:true});
     document.addEventListener('pointerdown',event=>{
       if(birdPointer.matches&&event.pointerType==='mouse'&&event.button===0)bird.classList.add('pressing');

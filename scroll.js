@@ -1,6 +1,14 @@
 // Scroll is native. One scheduled frame reads geometry, then updates visual properties.
 const scrollPreference=matchMedia('(prefers-reduced-motion: reduce)');
 const clampScroll=value=>Math.max(0,Math.min(1,value));
+const scrollStyleValues=new WeakMap();
+function writeScrollStyle(element,property,value){
+  let values=scrollStyleValues.get(element);
+  if(!values){values=new Map();scrollStyleValues.set(element,values)}
+  if(values.get(property)===value)return;
+  values.set(property,value);element.style.setProperty(property,value);
+}
+let scrollHeaderHeight=100;
 const scrollScenes=[...document.querySelectorAll('main>.section')].map((section,index,sections)=>{
   const track=document.createElement('div');track.className='section-track';track.style.zIndex=String(index+1);
   section.before(track);track.append(section);section.classList.add('scroll-scene');
@@ -9,13 +17,16 @@ const scrollScenes=[...document.querySelectorAll('main>.section')].map((section,
 });
 function measureScrollScenes(){
   const headerHeight=document.querySelector('.header').offsetHeight;
-  document.documentElement.style.setProperty('--scene-header-height',`${headerHeight}px`);
+  const sectionHeights=scrollScenes.map(({section})=>section.offsetHeight);
+  scrollHeaderHeight=headerHeight;
+  writeScrollStyle(document.documentElement,'--scene-header-height',`${headerHeight}px`);
   scrollScenes.forEach(({section,track,last},index)=>{
-    const keepFactsReadable=['about','certificates'].includes(section.id)&&section.offsetHeight>innerHeight-headerHeight;
-    const overlap=last||scrollPreference.matches||keepFactsReadable?0:Math.min(Math.round(innerHeight*(innerWidth<651?.45:.72)),scrollScenes[index+1].section.offsetHeight);
-    track.style.setProperty('--scene-overlap',`${overlap}px`);
-    track.style.setProperty('--scene-track-height',`${section.offsetHeight+overlap}px`);
-    section.style.setProperty('--scene-top',`${Math.min(headerHeight,innerHeight-section.offsetHeight)}px`);
+    const sectionHeight=sectionHeights[index];
+    const keepFactsReadable=['about','certificates'].includes(section.id)&&sectionHeight>innerHeight-headerHeight;
+    const overlap=last||scrollPreference.matches||keepFactsReadable?0:Math.min(Math.round(innerHeight*(innerWidth<651?.45:.72)),sectionHeights[index+1]);
+    writeScrollStyle(track,'--scene-overlap',`${overlap}px`);
+    writeScrollStyle(track,'--scene-track-height',`${sectionHeight+overlap}px`);
+    writeScrollStyle(section,'--scene-top',`${Math.min(headerHeight,innerHeight-sectionHeight)}px`);
   });
   scheduleScrollFrame();
 }
@@ -25,6 +36,7 @@ const scrollCards=[...document.querySelectorAll('.portfolio-card')];
 const scrollLabels=[...document.querySelectorAll('.section-label')];
 const scrollHero=document.querySelector('.hero'),scrollPortrait=document.querySelector('.portrait'),scrollBackdrop=document.querySelector('.portrait-backdrop');
 const scrollHeroCopy=document.querySelector('.hero-copy'),scrollContact=document.querySelector('.contact');
+const scrollReading=document.querySelector('.about-copy'),scrollContactButton=document.querySelector('.contact-circle');
 
 function prepareScrollText(){
   scrollTitles=[...document.querySelectorAll('.section h2')].map(heading=>{
@@ -49,51 +61,52 @@ function renderScrollFrame(){
   scrollFrame=0;
   const height=innerHeight,mobile=innerWidth<651;
   const contactRect=scrollContact.getBoundingClientRect();
-  const availableHeight=Math.max(1,height-document.querySelector('.header').offsetHeight);
+  const availableHeight=Math.max(1,height-scrollHeaderHeight);
   const contactCoverage=clampScroll((height-contactRect.top)/Math.max(1,Math.min(contactRect.height,availableHeight)));
-  scrollContact.parentElement.style.setProperty('--contact-backdrop',String(clampScroll((contactCoverage-.35)/.65)));
-  if(scrollPreference.matches)return;
+  const backdrop=String(clampScroll((contactCoverage-.35)/.65));
+  if(scrollPreference.matches){writeScrollStyle(scrollContact.parentElement,'--contact-backdrop',backdrop);return}
   const titleRects=scrollTitles.map(item=>item.heading.getBoundingClientRect());
   const mediaRects=scrollMedia.map(el=>el.getBoundingClientRect());
   const cardRects=scrollCards.map(el=>el.getBoundingClientRect());
   const labelRects=scrollLabels.map(el=>el.getBoundingClientRect());
   const heroRect=scrollHero.getBoundingClientRect();
-  const readingRect=document.querySelector('.about-copy').getBoundingClientRect();
+  const readingRect=scrollReading.getBoundingClientRect();
   const sceneRects=scrollScenes.map(({track})=>track.getBoundingClientRect());
+  writeScrollStyle(scrollContact.parentElement,'--contact-backdrop',backdrop);
   scrollTitles.forEach((item,index)=>{
     const rect=titleRects[index],progress=clampScroll((height*.95-rect.top)/(height*.36));
-    item.lines.forEach((line,lineIndex)=>{const p=clampScroll(progress*1.2-lineIndex*.1);line.style.setProperty('--title-y',`${(1-p)*110}%`);line.style.setProperty('--title-rotate',`${(1-p)*2}deg`);line.style.setProperty('--title-opacity',String(.2+p*.8))});
+    item.lines.forEach((line,lineIndex)=>{const p=clampScroll(progress*1.2-lineIndex*.1);writeScrollStyle(line,'--title-y',`${(1-p)*110}%`);writeScrollStyle(line,'--title-rotate',`${(1-p)*2}deg`);writeScrollStyle(line,'--title-opacity',String(.2+p*.8))});
   });
   const readingProgress=clampScroll((height*.94-readingRect.top)/(height*.48));
-  readingWords.forEach((word,index)=>word.style.setProperty('--word-opacity',String(.38+.62*clampScroll(readingProgress*1.5-index/readingWords.length*.5))));
+  readingWords.forEach((word,index)=>writeScrollStyle(word,'--word-opacity',String(.38+.62*clampScroll(readingProgress*1.5-index/readingWords.length*.5))));
   scrollMedia.forEach((element,index)=>{
     const rect=mediaRects[index];if(rect.bottom< -100||rect.top>height+150)return;
     const enter=clampScroll((height*.98-rect.top)/(height*.37));
     const drift=(clampScroll((height-rect.top)/(height+rect.height))-.5)*(mobile?15:35);
-    element.style.setProperty('--media-mask',`${(1-enter)*32}%`);element.style.setProperty('--media-y',`${drift}px`);
+    writeScrollStyle(element,'--media-mask',`${(1-enter)*32}%`);writeScrollStyle(element,'--media-y',`${drift}px`);
     const travel=clampScroll((height-rect.top)/(height+rect.height));
-    element.style.setProperty('--photo-scale',String(1+travel*(mobile?.07:.14)));
-    element.style.setProperty('--photo-y',`${(.5-travel)*(mobile?10:24)}px`);
-    element.style.setProperty('--photo-x',`${(travel-.5)*(index%2===0?1:-1)*(mobile?4:12)}px`);
+    writeScrollStyle(element,'--photo-scale',String(1+travel*(mobile?.07:.14)));
+    writeScrollStyle(element,'--photo-y',`${(.5-travel)*(mobile?10:24)}px`);
+    writeScrollStyle(element,'--photo-x',`${(travel-.5)*(index%2===0?1:-1)*(mobile?4:12)}px`);
   });
   scrollCards.forEach((card,index)=>{
     const rect=cardRects[index],p=clampScroll((height-rect.top)/(height*.65));
-    card.style.setProperty('--card-y',`${(1-p)*(mobile?20:[30,65,100][index%3])}px`);
+    writeScrollStyle(card,'--card-y',`${(1-p)*(mobile?20:[30,65,100][index%3])}px`);
   });
-  scrollLabels.forEach((label,index)=>{const p=clampScroll((height*.96-labelRects[index].top)/(height*.3));label.style.setProperty('--label-x',`${(1-p)*-24}px`);label.style.setProperty('--label-opacity',String(.35+p*.65))});
+  scrollLabels.forEach((label,index)=>{const p=clampScroll((height*.96-labelRects[index].top)/(height*.3));writeScrollStyle(label,'--label-x',`${(1-p)*-24}px`);writeScrollStyle(label,'--label-opacity',String(.35+p*.65))});
   const heroProgress=clampScroll(-heroRect.top/Math.max(heroRect.height,1));
-  scrollPortrait.style.setProperty('--portrait-y',`${heroProgress*(mobile?12:45)}px`);
-  scrollBackdrop.style.setProperty('--portrait-drift',`${heroProgress*(mobile?15:70)}px`);
-  scrollHeroCopy.style.setProperty('--hero-copy-y',`${heroProgress*(mobile?-8:-35)}px`);
+  writeScrollStyle(scrollPortrait,'--portrait-y',`${heroProgress*(mobile?12:45)}px`);
+  writeScrollStyle(scrollBackdrop,'--portrait-drift',`${heroProgress*(mobile?15:70)}px`);
+  writeScrollStyle(scrollHeroCopy,'--hero-copy-y',`${heroProgress*(mobile?-8:-35)}px`);
   const contactProgress=clampScroll((height-contactRect.top)/(height*.65));
-  scrollContact.style.setProperty('--contact-round',`${(1-contactProgress)*(mobile?40:110)}px`);
-  document.querySelector('.contact-circle').style.setProperty('--contact-button-y',`${(1-contactProgress)*60}px`);
+  writeScrollStyle(scrollContact,'--contact-round',`${(1-contactProgress)*(mobile?40:110)}px`);
+  writeScrollStyle(scrollContactButton,'--contact-button-y',`${(1-contactProgress)*60}px`);
   scrollScenes.forEach(({section,last},index)=>{
     const enter=clampScroll((height-sceneRects[index].top)/(height*.72));
     const next=last?null:sceneRects[index+1];
     const exit=next?clampScroll((height-next.top)/(height*.85)):0;
-    section.style.setProperty('--scene-dim',String(1-exit*.16));
-    section.style.setProperty('--scene-radius',`${(1-enter)*(mobile?30:65)+exit*(mobile?12:24)}px`);
+    writeScrollStyle(section,'--scene-dim',String(1-exit*.16));
+    writeScrollStyle(section,'--scene-radius',`${(1-enter)*(mobile?30:65)+exit*(mobile?12:24)}px`);
   });
 }
 const blockObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('scroll-visible',entry.isIntersecting)),{threshold:.06,rootMargin:'0px 0px -30px 0px'});

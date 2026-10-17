@@ -1,5 +1,6 @@
 :root{--blue:#3767df;--cyan:#219bc8;--gradient:linear-gradient(115deg,#7944df,#5266e8 55%,#269dc7)}
 :root[data-theme=dark]{--blue:#96adff;--cyan:#78d2f0;--gradient:linear-gradient(115deg,#bc9bff,#9baaff 55%,#79d7ed)}
+.hero.ambient-paused:before,.hero.ambient-paused :is(h1 em,.tiny-star,.status-dot,.portrait-backdrop,.floating-chip,.globe),.name-marquee.ambient-paused :is(.marquee-track,span),.contact.ambient-paused .contact-circle,.contact.ambient-paused .contact-circle:before,.contact.ambient-paused .contact-circle:after{animation-play-state:paused}
 .motion-enabled .header{animation:header-arrive .7s cubic-bezier(.22,1,.36,1) both}
 .header{transition:background .4s,box-shadow .4s}
 .header.has-scrolled{box-shadow:0 8px 32px rgb(70 44 130 / 9%)}

@@ -1,7 +1,20 @@
 /* Larger reading sizes, with scroll choreography kept separate from hover effects. */
+/* These values belong to the animated element, not to every node below it. */
+@property --scene-dim{syntax:"<number>";inherits:false;initial-value:1}
+@property --scene-radius{syntax:"<length>";inherits:false;initial-value:0px}
+@property --title-y{syntax:"<percentage>";inherits:false;initial-value:0%}
+@property --title-rotate{syntax:"<angle>";inherits:false;initial-value:0deg}
+@property --title-opacity{syntax:"<number>";inherits:false;initial-value:1}
+@property --word-opacity{syntax:"<number>";inherits:false;initial-value:1}
+@property --media-mask{syntax:"<percentage>";inherits:false;initial-value:0%}
+@property --media-y{syntax:"<length>";inherits:false;initial-value:0px}
+@property --card-y{syntax:"<length>";inherits:false;initial-value:0px}
+@property --label-x{syntax:"<length>";inherits:false;initial-value:0px}
+@property --label-opacity{syntax:"<number>";inherits:false;initial-value:1}
 body{font-size:17px}
 main{overflow-anchor:none}
 main{isolation:isolate}
+.progress{width:100%;transform:scaleX(0);transform-origin:left}
 .section-track{position:relative}
 .scroll-scene{width:100%;max-width:none;padding-inline:max(6%,calc((100% - 1408px)/2))}
 .scroll-motion .section-track{height:var(--scene-track-height,auto);margin-bottom:calc(-1*var(--scene-overlap,0px))}
