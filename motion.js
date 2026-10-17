@@ -1,6 +1,40 @@
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 function updateMotionPreference(){document.documentElement.classList.toggle('motion-enabled',!motionPreference.matches)}
 updateMotionPreference();motionPreference.addEventListener('change',updateMotionPreference);
+const animatedHeader=document.querySelector('.header');
+const animatedNav=animatedHeader.querySelector('nav');
+const animatedNavLinks=[...animatedNav.querySelectorAll('a[href^="#"]')];
+const navIndicator=document.createElement('span');
+navIndicator.className='nav-indicator';navIndicator.setAttribute('aria-hidden','true');animatedNav.append(navIndicator);
+const navSections=[...document.querySelectorAll('.section[id]')].filter(section=>animatedNavLinks.some(link=>link.hash===`#${section.id}`));
+let activeNavLink=null,hoveredNavLink=null,headerFrame=0;
+function placeNavIndicator(link){
+  navIndicator.classList.toggle('visible',!!link);
+  if(!link)return;
+  const navRect=animatedNav.getBoundingClientRect(),linkRect=link.getBoundingClientRect();
+  navIndicator.style.setProperty('--nav-x',`${linkRect.left-navRect.left-12}px`);
+  navIndicator.style.setProperty('--nav-y',`${linkRect.top-navRect.top-9}px`);
+  navIndicator.style.setProperty('--nav-width',`${linkRect.width+24}px`);
+  navIndicator.style.setProperty('--nav-height',`${linkRect.height+18}px`);
+}
+function updateAnimatedHeader(){
+  headerFrame=0;animatedHeader.classList.toggle('has-scrolled',scrollY>20);
+  const threshold=animatedHeader.offsetHeight+innerHeight*.2;
+  const section=navSections.findLast(item=>item.getBoundingClientRect().top<=threshold);
+  activeNavLink=animatedNavLinks.find(link=>link.hash===`#${section?.id}`)||null;
+  animatedNavLinks.forEach(link=>{if(link===activeNavLink)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current')});
+  placeNavIndicator(hoveredNavLink||activeNavLink);
+}
+function queueHeaderUpdate(){if(!headerFrame)headerFrame=requestAnimationFrame(updateAnimatedHeader)}
+animatedNavLinks.forEach(link=>{
+  link.addEventListener('pointerenter',()=>{hoveredNavLink=link;placeNavIndicator(link)});
+  link.addEventListener('focus',()=>placeNavIndicator(link));
+  link.addEventListener('blur',()=>placeNavIndicator(activeNavLink));
+});
+animatedNav.addEventListener('pointerleave',()=>{hoveredNavLink=null;placeNavIndicator(activeNavLink)});
+addEventListener('scroll',queueHeaderUpdate,{passive:true});addEventListener('resize',queueHeaderUpdate);
+document.addEventListener('portfolio:languagechange',queueHeaderUpdate);addEventListener('load',queueHeaderUpdate);
+document.fonts.ready.then(queueHeaderUpdate);queueHeaderUpdate();
 document.querySelectorAll('.github-projects .reveal,.commercial-projects .reveal').forEach((el,i)=>el.style.setProperty('--reveal-delay',`${i%3*95}ms`));
 document.querySelectorAll('.skill-card').forEach((el,i)=>el.style.setProperty('--skill-delay',`${i%3*110}ms`));
 if(matchMedia('(pointer:fine)').matches){document.querySelectorAll('.commercial-cover,.project-image').forEach(el=>{
