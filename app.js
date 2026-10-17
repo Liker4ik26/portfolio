@@ -150,8 +150,7 @@ prepareAchievements();document.addEventListener('portfolio:languagechange',prepa
 function updateClock(){document.getElementById('clock').textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Omsk',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())}
 updateClock();setInterval(updateClock,30000);
 let framePending=false;
-const progressBar=document.querySelector('.progress');
-addEventListener('scroll',()=>{if(framePending)return;framePending=true;requestAnimationFrame(()=>{const max=document.documentElement.scrollHeight-innerHeight;progressBar.style.transform=`scaleX(${max>0?Math.min(1,Math.max(0,scrollY/max)):0})`;framePending=false})},{passive:true});
+addEventListener('scroll',()=>{if(framePending)return;framePending=true;requestAnimationFrame(()=>{const max=document.documentElement.scrollHeight-innerHeight;document.querySelector('.progress').style.width=(max>0?scrollY/max*100:0)+'%';framePending=false})},{passive:true});
 document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>transitionSite(()=>{
   const filter=button.dataset.filter;
   document.querySelectorAll('[data-filter]').forEach(b=>{const selected=b===button;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected))});
