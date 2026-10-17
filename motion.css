@@ -17,7 +17,8 @@
 .brand-icon span{display:inline-block;transition:transform .4s,color .4s}.brand:hover .brand-icon span{transform:rotate(180deg)}
 .location .globe{display:inline-block;animation:globe-breathe 5s ease-in-out infinite}
 .name-marquee span{display:inline-block;animation:rotate 20s linear infinite}
-.name-marquee:hover>div{animation-play-state:paused}
+.name-marquee>.marquee-track{display:flex;animation:marquee 25s linear infinite}
+.marquee-group{display:flex;align-items:center;justify-content:space-around;flex-shrink:0;min-width:100vw}
 .commercial-cover,.project-image{transform:perspective(850px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .45s ease,box-shadow .45s}
 .commercial-cover:hover,.project-image:hover{box-shadow:0 18px 35px rgb(73 55 131 / 15%)}
 .project-row:hover{background:color-mix(in srgb,var(--bg) 80%,#afa0ef 20%)}

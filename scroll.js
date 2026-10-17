@@ -24,7 +24,7 @@ const scrollMedia=[...document.querySelectorAll('.commercial-cover,.portfolio-ca
 const scrollCards=[...document.querySelectorAll('.portfolio-card')];
 const scrollLabels=[...document.querySelectorAll('.section-label')];
 const scrollHero=document.querySelector('.hero'),scrollPortrait=document.querySelector('.portrait'),scrollBackdrop=document.querySelector('.portrait-backdrop');
-const scrollHeroCopy=document.querySelector('.hero-copy'),scrollMarquee=document.querySelector('.name-marquee'),scrollContact=document.querySelector('.contact');
+const scrollHeroCopy=document.querySelector('.hero-copy'),scrollContact=document.querySelector('.contact');
 
 function prepareScrollText(){
   scrollTitles=[...document.querySelectorAll('.section h2')].map(heading=>{
@@ -57,7 +57,7 @@ function renderScrollFrame(){
   const mediaRects=scrollMedia.map(el=>el.getBoundingClientRect());
   const cardRects=scrollCards.map(el=>el.getBoundingClientRect());
   const labelRects=scrollLabels.map(el=>el.getBoundingClientRect());
-  const heroRect=scrollHero.getBoundingClientRect(),marqueeRect=scrollMarquee.getBoundingClientRect();
+  const heroRect=scrollHero.getBoundingClientRect();
   const readingRect=document.querySelector('.about-copy').getBoundingClientRect();
   const sceneRects=scrollScenes.map(({track})=>track.getBoundingClientRect());
   scrollTitles.forEach((item,index)=>{
@@ -85,7 +85,6 @@ function renderScrollFrame(){
   scrollPortrait.style.setProperty('--portrait-y',`${heroProgress*(mobile?12:45)}px`);
   scrollBackdrop.style.setProperty('--portrait-drift',`${heroProgress*(mobile?15:70)}px`);
   scrollHeroCopy.style.setProperty('--hero-copy-y',`${heroProgress*(mobile?-8:-35)}px`);
-  scrollMarquee.firstElementChild.style.setProperty('--marquee-x',`${-clampScroll((height-marqueeRect.top)/(height+marqueeRect.height))*(mobile?60:180)}px`);
   const contactProgress=clampScroll((height-contactRect.top)/(height*.65));
   scrollContact.style.setProperty('--contact-round',`${(1-contactProgress)*(mobile?40:110)}px`);
   document.querySelector('.contact-circle').style.setProperty('--contact-button-y',`${(1-contactProgress)*60}px`);

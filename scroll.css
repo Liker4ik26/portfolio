@@ -56,7 +56,6 @@ dialog .small-note{font-size:12px}.gallery-toolbar{font-size:13px}#gallery-count
 .scroll-motion .portfolio-card{translate:0 var(--card-y,0px)}
 .scroll-motion .portrait{translate:0 var(--portrait-y,0px)}
 .scroll-motion .hero-copy{translate:0 var(--hero-copy-y,0px)}
-.scroll-motion .name-marquee>div{translate:var(--marquee-x,0px) 0}
 .scroll-motion .section-label{translate:var(--label-x,0px) 0;opacity:var(--label-opacity,1)}
 .contact{border-radius:var(--contact-round,0px) var(--contact-round,0px) 0 0;overflow:clip}
 .scroll-motion .contact-circle{translate:0 var(--contact-button-y,0px)}
