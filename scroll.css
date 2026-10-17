@@ -1,0 +1,97 @@
+/* Larger reading sizes, with scroll choreography kept separate from hover effects. */
+body{font-size:17px}
+main{overflow-anchor:none}
+main{isolation:isolate}
+.section-track{position:relative}
+.scroll-scene{width:100%;max-width:none;padding-inline:max(6%,calc((100% - 1408px)/2))}
+.scroll-motion .section-track{height:var(--scene-track-height,auto);margin-bottom:calc(-1*var(--scene-overlap,0px))}
+.scroll-motion .scroll-scene{position:sticky;top:var(--scene-top,0px);filter:brightness(var(--scene-dim,1));border-radius:var(--scene-radius,0px) var(--scene-radius,0px) 0 0;overflow:clip;box-shadow:0 -18px 45px rgb(38 24 76 / 5%)}
+.scroll-scene.about,.scroll-scene.expertise,.scroll-scene.skills,.scroll-scene.experience{background:var(--bg)}
+.contact-track::before{content:'';position:fixed;inset:0;z-index:-1;background:#211b36;opacity:var(--contact-backdrop,0);pointer-events:none}
+.scroll-scene-last{min-height:0;padding-top:64px}
+.scroll-scene-last .section-label{margin-bottom:32px}
+.scroll-scene-last .contact-links{margin-bottom:0}
+.scroll-scene-last footer{margin-top:36px}
+.scroll-motion .scroll-scene-last{position:relative;top:auto;transform:none;filter:none}
+.scroll-motion .commercial-cover img,.scroll-motion .portfolio-card .project-image img{scale:var(--photo-scale,1);translate:var(--photo-x,0px) var(--photo-y,0px);transition:scale .3s ease-out,translate .3s ease-out;transform:none;transform-origin:center}
+.scroll-motion .commercial-cover:hover img,.scroll-motion .portfolio-card .project-image:hover img{scale:calc(var(--photo-scale,1) + .025);transform:none}
+h2{font-size:clamp(44px,5.2vw,76px);line-height:1.13}
+.hero h1{font-size:clamp(58px,6.6vw,100px)}
+.hero-description{font-size:17px;max-width:430px;line-height:1.75}
+.intro-line,.brand{font-size:15px}
+.header nav{font-size:15px}.controls button{font-size:14px}
+.eyebrow,.hero-top,.edition,.section-label{font-size:12px}
+.pill,.text-link{font-size:15px}.pill{padding:19px 27px}
+.hero-bottom{font-size:13px}.portrait-caption{font-size:10px}
+.location{font-size:13px}.location small{font-size:10px}
+.floating-chip{font-size:14px}.floating-chip small{font-size:10px}
+.about-copy p{font-size:17px;line-height:1.85;margin-bottom:24px}
+.about-main{grid-template-columns:1.3fr 1fr;gap:7%}
+.stats strong{font-size:54px}.stats>div>span{font-size:13px}.stat-note p{font-size:14px}
+.small-note{font-size:13px}.filters button{font-size:14px;padding:11px 21px}
+.project-index{font-size:12px}.project-row .project-name small{font-size:13px}.project-stack{font-size:12px}
+.project-row{grid-template-columns:28px 220px minmax(0,1fr) 185px;gap:22px;position:relative;border:1px solid var(--line);transition:padding .4s,background .4s,border-color .3s,box-shadow .3s}
+.project-row:is(:hover,:focus-visible),.portfolio-card:is(:hover,:focus-within){z-index:1;border-color:#9b83f6;box-shadow:inset 12px 0 22px -14px rgb(142 104 249 / 55%),inset -12px 0 22px -14px rgb(98 183 249 / 55%),-12px 0 30px -16px rgb(143 98 247 / 70%),12px 0 30px -16px rgb(81 184 250 / 65%)}
+.portfolio-card.reveal{position:relative;border:1px solid var(--line);border-radius:9px;padding:14px;background:color-mix(in srgb,var(--bg) 96%,#afa0ef 4%);transition:opacity .8s,transform .8s,border-color .3s,box-shadow .3s}
+.portfolio-card .project-image{width:100%}
+.card-title h3{font-size:29px}.project-card p{font-size:16px;max-width:none;line-height:1.8;margin:12px 0}.card-stack{font-size:12px}
+.expertise-grid h3{font-size:23px;line-height:1.4}.expertise-grid p{font-size:16px;line-height:1.85}
+.tags span{font-size:12px;padding:6px 11px}
+.timeline h3{font-size:28px}.timeline .time{font-size:12px}.timeline article>span:not(.time){font-size:14px}
+.timeline p{font-size:16px;line-height:1.85}.timeline article{padding-bottom:38px}
+.recommendation blockquote{font-size:30px}.recommendation p{font-size:12px}
+.contact-circle{font-size:15px;width:175px;height:175px}.contact-links,.contact-links button{font-size:15px}
+.contact-bar button{font-size:13px}footer{font-size:12px}
+dialog p,dialog ul{font-size:16px;line-height:1.85}dialog h3{font-size:20px}.download-row{font-size:28px}.download-row small{font-size:12px}
+dialog .small-note{font-size:12px}.gallery-toolbar{font-size:13px}#gallery-count{font-size:12px}
+
+.title-line{display:block;overflow:clip;padding:.12em .04em .18em 0;margin:-.12em -.04em -.18em 0}
+.title-line-inner{display:block}
+.scroll-motion .title-line-inner{transform:translate3d(0,var(--title-y,0%),0) rotate(var(--title-rotate,0deg));opacity:var(--title-opacity,1);transform-origin:left bottom}
+.scroll-motion .reading-word{opacity:var(--word-opacity,1);transition:opacity .12s linear}
+.scroll-motion .scroll-block{opacity:0;translate:0 45px;transition:opacity 1s cubic-bezier(.16,1,.3,1),translate 1s cubic-bezier(.16,1,.3,1);transition-delay:var(--block-delay,0ms)}
+.scroll-motion .scroll-block.scroll-visible{opacity:1;translate:0 0}
+.scroll-motion .commercial-cover{clip-path:inset(var(--media-mask,0%) 0 0 0 round 5px);translate:0 var(--media-y,0px)}
+.scroll-motion .portfolio-card .project-image{clip-path:inset(var(--media-mask,0%) 0 0 0 round 8px);translate:0 var(--media-y,0px)}
+.scroll-motion .portfolio-card{translate:0 var(--card-y,0px)}
+.scroll-motion .portrait{translate:0 var(--portrait-y,0px)}
+.scroll-motion .hero-copy{translate:0 var(--hero-copy-y,0px)}
+.scroll-motion .name-marquee>div{translate:var(--marquee-x,0px) 0}
+.scroll-motion .section-label{translate:var(--label-x,0px) 0;opacity:var(--label-opacity,1)}
+.contact{border-radius:var(--contact-round,0px) var(--contact-round,0px) 0 0;overflow:clip}
+.scroll-motion .contact-circle{translate:0 var(--contact-button-y,0px)}
+@media(min-width:1051px){.about-main>h2,.experience-grid>h2{position:sticky;top:145px;align-self:start}.about-copy{padding-top:10px}}
+@media(max-width:1050px){.project-row{grid-template-columns:25px 190px minmax(0,1fr);gap:20px}.project-row .project-stack{display:none}.hero h1{font-size:6.6vw}.about-main{gap:5%}.contact-links{gap:25px}.stats{gap:20px}}
+@media(max-width:650px){
+  .scroll-scene-last{padding-top:52px}
+  .scroll-scene-last .section-label{margin-bottom:28px}
+  .scroll-scene-last footer{margin-top:30px}
+  .hero:before{width:75%;left:5%}
+  h2{font-size:43px}.hero h1{font-size:clamp(54px,12vw,76px)}
+  .hero-description{font-size:16px;max-width:350px}.intro-line{font-size:14px}
+  .brand>span:last-child{font-size:11px}.controls button{font-size:13px}
+  .hero-top,.eyebrow,.edition{font-size:9px}.section-label{font-size:11px}
+  .hero-bottom{font-size:11px;align-items:start}.hero-bottom>span{max-width:180px}.scroll-link{gap:10px}
+  .pill{font-size:14px;padding:17px 23px}.portrait-caption{font-size:7px}
+  .floating-chip{font-size:12px}.floating-chip small{font-size:9px}.location{font-size:11px}.location small{font-size:8px}
+  .about-main{grid-template-columns:1fr;gap:32px}.about-copy p{font-size:16px}
+  .stats strong{font-size:44px}.stats>div>span{font-size:12px}
+  .small-note{font-size:12px}.filters{gap:7px}.filters button{font-size:12px;padding:10px 14px}
+  .project-row{grid-template-columns:22px minmax(0,1fr);gap:18px 12px}.project-row .project-name{font-size:31px}.project-row .project-name small{font-size:12px}
+  .card-title h3{font-size:28px}.project-card p{font-size:16px}.card-stack{font-size:12px}
+  .expertise-grid h3{font-size:23px}.expertise-grid p{font-size:16px}.tags span{font-size:11px}
+  .timeline h3{font-size:25px}.timeline p{font-size:16px}.timeline .time{font-size:11px}
+  .recommendation blockquote{font-size:25px}.recommendation p{font-size:11px}
+  .contact h2{font-size:44px}.contact-circle{width:135px;height:135px;font-size:12px}
+  .contact-links,.contact-links button{font-size:14px}.contact-bar button{font-size:12px}footer{font-size:10px}
+  dialog p,dialog ul{font-size:15px}.download-row{font-size:27px}.gallery-toolbar{font-size:12px}.gallery-toolbar>div{gap:6px}
+  #gallery-thumbnails button{flex-basis:80px}#gallery-caption{max-width:175px}
+}
+@media(prefers-reduced-motion:reduce){
+  .title-line-inner,.reading-word,.scroll-block{opacity:1!important;transform:none!important;translate:none!important}
+  .commercial-cover,.portfolio-card,.project-image,.portrait,.hero-copy,.section-label,.contact-circle,.name-marquee>div{translate:none!important;clip-path:none!important}
+  .contact{border-radius:0}
+  .section-track{height:auto!important;padding-bottom:0!important;margin-bottom:0!important}
+  .scroll-scene{position:relative!important;top:auto!important;transform:none!important;filter:none!important;border-radius:0!important;box-shadow:none!important}
+  .commercial-cover img,.portfolio-card .project-image img{scale:1!important;translate:none!important}
+}

@@ -1,0 +1,19 @@
+.certificates{background:var(--bg)}
+.certificates h2{margin-bottom:48px}
+.certificate-card{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
+.certificate-card+.certificate-card{margin-top:64px;padding-top:64px;border-top:1px solid var(--line)}
+.certificate-image{display:block;min-width:0;background:transparent}
+.certificate-image img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:18px}
+.certificate-image>span{display:flex;align-items:center;justify-content:center;width:fit-content;max-width:calc(100% - 32px);min-height:48px;margin:16px auto 0;padding:12px 24px;background:transparent;color:var(--accent);border:1.5px solid currentColor;border-radius:40px;font-size:13px;font-weight:600;text-align:center;box-shadow:0 0 8px rgb(113 70 216 / 24%),0 0 22px rgb(113 70 216 / 18%),inset 0 0 8px rgb(113 70 216 / 8%);transition:color .3s,box-shadow .3s}
+.certificate-image:hover>span,.certificate-image:focus-visible>span{color:var(--accent-bright);box-shadow:0 0 10px rgb(113 70 216 / 40%),0 0 30px rgb(113 70 216 / 28%),inset 0 0 10px rgb(113 70 216 / 12%)}
+.certificate-copy{min-width:0}
+.certificate-copy h3{font-size:clamp(24px,2.5vw,36px);line-height:1.25;letter-spacing:-.035em;margin:14px 0 18px}
+.certificate-copy>p:not(.eyebrow){color:var(--muted);max-width:48ch}
+.certificate-copy dl{margin:26px 0;display:grid;gap:12px}
+.certificate-copy dl>div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-size:13px}
+.certificate-copy dt{color:var(--muted)}
+.certificate-copy dd{margin:0;font-weight:600}
+.certificate-actions{display:flex;align-items:center;flex-wrap:wrap;gap:18px 24px}
+.certificate-actions .pill{font-size:13px;white-space:normal;text-align:center;justify-content:center;background:transparent;color:var(--accent);border:1.5px solid currentColor;box-shadow:0 0 8px rgb(113 70 216 / 24%),0 0 22px rgb(113 70 216 / 18%);text-shadow:none}
+.certificate-actions .pill:hover,.certificate-actions .pill:focus-visible{background:transparent;color:var(--accent-bright);border-color:currentColor;box-shadow:0 0 10px rgb(113 70 216 / 40%),0 0 30px rgb(113 70 216 / 28%);text-shadow:none}
+@media(max-width:800px){.certificate-card{grid-template-columns:1fr;gap:28px}.certificates h2{margin-bottom:30px}.certificate-copy h3{max-width:24ch}.certificate-actions{align-items:stretch;flex-direction:column}.certificate-actions .pill{justify-content:center}.certificate-image>span{width:calc(100% - 32px)}}
