@@ -1,8 +1,8 @@
-// Ease discrete mouse-wheel steps without replacing native touch/trackpad scrolling.
+// Smooth desktop wheel input; touch scrolling and nested scrollers stay native.
 (()=>{
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer=matchMedia('(hover: hover) and (pointer: fine)');
-  let frame=0,current=0,target=0,lastTime=0,lastWritten=0,nativeUntil=0,direction=0;
+  let frame=0,current=0,target=0,lastTime=0,lastWritten=0,direction=0,easeDuration=150;
   const maximum=()=>Math.max(0,document.documentElement.scrollHeight-innerHeight);
   const clamp=(value,max)=>Math.max(0,Math.min(max,value));
   function stop(){
@@ -14,7 +14,7 @@
     if(reduced.matches||!finePointer.matches||document.hidden||Math.abs(scrollY-lastWritten)>2){stop();return}
     target=clamp(target,maximum());
     const elapsed=Math.min(64,Math.max(0,now-lastTime));lastTime=now;
-    current+=(target-current)*(1-Math.exp(-elapsed/150));
+    current+=(target-current)*(1-Math.exp(-elapsed/easeDuration));
     const settled=Math.abs(target-current)<.5;
     if(settled)current=target;
     window.scrollTo({top:current,behavior:'instant'});lastWritten=scrollY;
@@ -32,11 +32,8 @@
   addEventListener('wheel',event=>{
     if(event.defaultPrevented||!event.cancelable||reduced.matches||!finePointer.matches||event.ctrlKey||event.metaKey||event.shiftKey||!event.deltaY||Math.abs(event.deltaX)>Math.abs(event.deltaY)||needsNativeScroll(event)){stop();return}
     const now=performance.now();
-    // Small, fractional or diagonal pixel deltas already carry trackpad precision/inertia.
-    if(event.deltaMode===0&&(Math.abs(event.deltaY)<40||!Number.isInteger(event.deltaY)||event.deltaX!==0)){
-      nativeUntil=now+400;stop();return;
-    }
-    if(now<nativeUntil){stop();return}
+    // Precision devices need less lag because the OS already supplies momentum.
+    easeDuration=event.deltaMode===0&&(Math.abs(event.deltaY)<40||!Number.isInteger(event.deltaY))?65:150;
     const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?innerHeight:1);
     const nextDirection=Math.sign(delta),max=maximum();
     if(!frame||direction!==nextDirection){current=scrollY;target=current}
