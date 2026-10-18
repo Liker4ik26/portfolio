@@ -32,6 +32,7 @@ Object.assign(translations.en,{
 });
 Object.assign(translations.en,{factRefactor:'2 months',factRefactorText:'application architecture refactoring',factProgress:'1 day',factProgressText:'to fix a complex bug'});
 translations.en.navPersonal='Personal projects';
+Object.assign(translations.en,{navMentoring:'Mentoring',navRecommendation:'Recommendation'});
 translations.en.portfolioDisk='Portfolio on Yandex Disk';
 translations.en.callPhone='Call';
 Object.assign(translations.en,{formTitle:'Message me',formIntro:'Tell me about a role, a project, or your idea.',formName:'Name',formEmail:'Reply email',formMessage:'Message',formNote:'Your email app will open with a prepared draft. Send the message from there.',formPrepare:'Prepare email',formCopy:'Copy message text'});

@@ -37,6 +37,29 @@ const scrollLabels=[...document.querySelectorAll('.section-label')];
 const scrollHero=document.querySelector('.hero'),scrollPortrait=document.querySelector('.portrait'),scrollBackdrop=document.querySelector('.portrait-backdrop');
 const scrollHeroCopy=document.querySelector('.hero-copy'),scrollContact=document.querySelector('.contact');
 const scrollReading=document.querySelector('.about-copy'),scrollContactButton=document.querySelector('.contact-circle');
+const sectionNavigation=[...document.querySelectorAll('.header nav a[href^="#"]')];
+let navigationDestination=null,currentSection=null;
+function updateSectionNavigation(){
+  const headerHeight=scrollHeaderHeight;
+  if(navigationDestination!==null){
+    if(Math.abs(scrollY-navigationDestination)>3)return;
+    navigationDestination=null;
+  }
+  // Use each scene's track: sticky sections overlap during their transitions.
+  let active=null;
+  for(const {section,track} of scrollScenes){
+    if(track.getBoundingClientRect().top<=headerHeight+8)active=section.id;
+  }
+  if(active===currentSection)return;
+  currentSection=active;
+  sectionNavigation.forEach(link=>{
+    if(link.hash===`#${active}`)link.setAttribute('aria-current','location');
+    else link.removeAttribute('aria-current');
+  });
+  const hash=active?`#${active}`:'';
+  if(location.hash!==hash)history.replaceState(null,'',`${location.pathname}${location.search}${hash}`);
+}
+
 
 function prepareScrollText(){
   scrollTitles=[...document.querySelectorAll('.section h2')].map(heading=>{
@@ -59,6 +82,7 @@ function prepareScrollText(){
 function scheduleScrollFrame(){if(!scrollFrame)scrollFrame=requestAnimationFrame(renderScrollFrame)}
 function renderScrollFrame(){
   scrollFrame=0;
+  updateSectionNavigation();
   const height=innerHeight,mobile=innerWidth<651;
   const contactRect=scrollContact.getBoundingClientRect();
   const availableHeight=Math.max(1,height-scrollHeaderHeight);
@@ -120,12 +144,24 @@ const filterLayoutObserver=new MutationObserver(scheduleScrollFrame);
 filterLayoutObserver.observe(document.querySelector('.work'),{subtree:true,attributes:true,attributeFilter:['hidden']});
 const sceneSizeObserver=new ResizeObserver(measureScrollScenes);
 scrollScenes.forEach(({section})=>sceneSizeObserver.observe(section));
+function navigateToSection(hash,behavior){
+  const target=hash==='#'||!hash?null:document.getElementById(hash.slice(1));
+  const scene=target?.closest('.section-track');if(hash&&hash!=='#'&&!scene)return false;
+  const top=scene?scene.getBoundingClientRect().top+scrollY-document.querySelector('.header').offsetHeight:0;
+  navigationDestination=Math.max(0,Math.min(top,document.documentElement.scrollHeight-innerHeight));
+  window.scrollTo({top:navigationDestination,behavior});
+  scheduleScrollFrame();return true;
+}
 document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',event=>{
-  const hash=link.getAttribute('href');const target=hash==='#'?null:document.querySelector(hash);
-  const scene=target?.closest('.section-track');if(hash!=='#'&&!scene)return;
-  event.preventDefault();const top=scene?scene.getBoundingClientRect().top+scrollY-document.querySelector('.header').offsetHeight:0;
+  const hash=link.getAttribute('href');
+  if(!navigateToSection(hash,scrollPreference.matches?'instant':'smooth'))return;
+  event.preventDefault();
   if(location.hash!==hash)history.pushState(null,'',hash);
-  window.scrollTo({top,behavior:scrollPreference.matches?'auto':'smooth'});
 }));
+['wheel','touchstart','pointerdown','keydown'].forEach(type=>addEventListener(type,()=>{navigationDestination=null},{passive:true}));
+addEventListener('popstate',()=>navigateToSection(location.hash,'instant'));
+// Native hash scrolling happens before the sticky scene tracks have been measured.
+const initialSectionHash=location.hash;
+addEventListener('load',()=>{measureScrollScenes();if(initialSectionHash)navigateToSection(initialSectionHash,'instant')});
 if(document.fonts)document.fonts.ready.then(measureScrollScenes);
 addEventListener('load',measureScrollScenes);

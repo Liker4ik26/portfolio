@@ -219,3 +219,18 @@ dialog .dialog-close{position:sticky;top:-30px;display:grid;place-items:center;m
   .contact-format{font-size:12px}
   .contact-links{gap:12px}
 }
+
+.header nav{gap:clamp(10px,1vw,18px);font-size:12px;white-space:nowrap}
+.header nav a[aria-current="location"]{color:var(--accent);text-shadow:0 0 16px rgb(113 70 216 / 30%)}
+.header nav a[aria-current="location"]::after{width:100%;background:linear-gradient(90deg,var(--accent),#53caff)}
+@media(max-width:1350px){
+  .header nav{display:none;position:absolute;top:100%;left:0;right:0;padding:24px 6%;background:var(--bg);border-bottom:1px solid var(--line);max-height:calc(100dvh - 100px);overflow-y:auto;font-size:16px;white-space:normal}
+  .header nav.open{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px}
+  .header nav a{padding:8px 0}
+  .header nav a::after{bottom:3px}
+  #menu{display:block;font-size:23px}
+}
+@media(max-width:650px){
+  .header nav{max-height:calc(100dvh - 72px)}
+  .header nav.open{grid-template-columns:1fr;gap:4px}
+}
