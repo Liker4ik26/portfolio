@@ -182,7 +182,10 @@ dialog .dialog-close{position:sticky;top:-30px;display:grid;place-items:center;m
   .project-case{grid-template-columns:minmax(180px,30%) minmax(0,1fr);gap:24px;padding:24px}
   .hero .eyebrow{font-size:11px;max-width:75%}
 }
+.personal-section .github-projects{grid-template-columns:repeat(2,minmax(0,1fr))}
+.project-status{font-size:12px;line-height:1.5;color:var(--accent);text-align:right;max-width:155px}
 @media(max-width:650px){
+  .personal-section .github-projects{grid-template-columns:1fr}
   .about-main,.mentoring-grid{grid-template-columns:1fr}
   .about h2{font-size:38px}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 18px}
