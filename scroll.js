@@ -129,7 +129,6 @@ function renderScrollFrame(){
     const enter=clampScroll((height-sceneRects[index].top)/(height*.72));
     const next=last?null:sceneRects[index+1];
     const exit=next?clampScroll((height-next.top)/(height*.85)):0;
-    writeScrollStyle(section,'--scene-dim',String(1-exit*.16));
     writeScrollStyle(section,'--scene-radius',`${(1-enter)*(mobile?30:65)+exit*(mobile?12:24)}px`);
   });
 }

@@ -1,6 +1,5 @@
 /* Larger reading sizes, with scroll choreography kept separate from hover effects. */
 /* These values belong to the animated element, not to every node below it. */
-@property --scene-dim{syntax:"<number>";inherits:false;initial-value:1}
 @property --scene-radius{syntax:"<length>";inherits:false;initial-value:0px}
 @property --title-y{syntax:"<percentage>";inherits:false;initial-value:0%}
 @property --title-rotate{syntax:"<angle>";inherits:false;initial-value:0deg}
@@ -18,7 +17,7 @@ main{isolation:isolate}
 .section-track{position:relative}
 .scroll-scene{width:100%;max-width:none;padding-inline:max(6%,calc((100% - 1408px)/2))}
 .scroll-motion .section-track{height:var(--scene-track-height,auto);margin-bottom:calc(-1*var(--scene-overlap,0px))}
-.scroll-motion .scroll-scene{position:sticky;top:var(--scene-top,0px);filter:brightness(var(--scene-dim,1));border-radius:var(--scene-radius,0px) var(--scene-radius,0px) 0 0;overflow:clip;box-shadow:0 -18px 45px rgb(38 24 76 / 5%)}
+.scroll-motion .scroll-scene{position:sticky;top:var(--scene-top,0px);border-radius:var(--scene-radius,0px) var(--scene-radius,0px) 0 0;overflow:clip;box-shadow:0 -18px 45px rgb(38 24 76 / 5%)}
 .scroll-scene.about,.scroll-scene.expertise,.scroll-scene.skills,.scroll-scene.experience{background:var(--bg)}
 .contact-track::before{content:'';position:fixed;inset:0;z-index:-1;background:#211b36;opacity:var(--contact-backdrop,0);pointer-events:none}
 .scroll-scene-last{min-height:0;padding-top:64px}
