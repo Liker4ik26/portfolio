@@ -35,6 +35,7 @@ translations.en.navPersonal='Personal projects';
 Object.assign(translations.en,{navMentoring:'Mentoring',navRecommendation:'Recommendation'});
 translations.en.portfolioDisk='Portfolio on Yandex Disk';
 translations.en.callPhone='Call';
+translations.en.moscowTimeNote='I can work on Moscow time (UTC+3). The time difference is no problem for working with the team.';
 Object.assign(translations.en,{formTitle:'Message me',formIntro:'Tell me about a role, a project, or your idea.',formName:'Name',formEmail:'Reply email',formMessage:'Message',formNote:'Your email app will open with a prepared draft. Send the message from there.',formPrepare:'Prepare email',formCopy:'Copy message text'});
 Object.assign(translations.en,{rentTraceStatus:'In development · source code is private',rentTraceDesc:'Rental stories before you rent: city selection, a map and address search in Serbia, tenant experiences and adding a missing address.',viewRentTrace:'Explore the project'});
 const ru = Object.fromEntries([...document.querySelectorAll('[data-i]')].map(el=>[el.dataset.i,el.innerHTML]));
