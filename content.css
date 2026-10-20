@@ -167,6 +167,7 @@ dialog .dialog-close{position:sticky;top:-30px;display:grid;place-items:center;m
 .skill-proof button:hover{ text-shadow:0 0 12px color-mix(in srgb,var(--accent) 50%,transparent)}
 .contact-intro{max-width:700px;font-size:17px;line-height:1.85;margin-top:26px;color:#d4cfe6}
 .contact-format{font-size:13px;color:#b9adff;margin-top:12px}
+.location small[data-i="moscowTimeNote"]{margin-top:4px;font-size:clamp(12px,.9vw,14px);font-weight:700;line-height:1.45;opacity:1;color:#c9b5ff;background:linear-gradient(100deg,#c9a9ff,#83e2ff);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 7px #a68bfa66)}
 .contact h2{font-size:clamp(46px,6vw,88px)}
 .contact-circle{text-align:center;padding:18px}
 .contact-title{gap:40px}
